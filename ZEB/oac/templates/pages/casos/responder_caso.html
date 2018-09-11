@@ -1,0 +1,180 @@
+{% extends "../../index2.html" %}
+{% load staticfiles %}
+
+{% block header %}    
+  <h1>
+    Atencion de Caso
+    <small>Responder</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="{% url 'Inicio' %}"><i class="fa fa-dashboard"></i> Incio</a></li>
+    <li class="active">Responder caso</li>
+  </ol> 
+{% endblock %}
+
+{% block titulo %}
+  <title>Responder casos | O.A.C</title>
+{% endblock %}
+
+{% block link %}
+<!-- Bootstrap 3.3.6 -->
+  <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{% static "plugins/datatables/dataTables.bootstrap.css" %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static "dist/css/AdminLTE.min.css" %}">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="{% static "dist/css/skins/_all-skins.min.css" %}">
+  
+{% endblock %}
+
+{% block contenido %}
+	<div class="col-md-7">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+              <i class="fa fa-file-text"></i>
+
+              <h3 class="box-title">Descripción del Caso</h3>
+            {% if perms.oac.add_caso %} 
+              <a href="generar_etiqueta/" class="btn btn-default pull-right" role="button"><i class="glyphicon glyphicon-tag"></i>&nbsp; <strong title="Descargar">Etiqueta</strong></a>
+            {% endif %}
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+            	<!-- Descripcion Horizontal -->
+              <dl class="dl-horizontal">
+              	<input type="hidden" value="{{ caso.estado }}" id="estado">
+              	<input type="hidden" value="{{ caso.id }}" id="pk">
+                <dt><h4><strong>Nombre y Apellidos: </strong></h4></dt>
+                <dd><h4>{{ caso.nombres|capfirst }} {{ caso.apellidos|capfirst }}</h4></dd>
+                <dt><h4><strong>Cedúla: </strong></h4></dt>
+                <dd><h4>{{ caso.cedula }}</h4></dd>
+                <dt><h4><strong>N° Caso: </strong></h4></dt>
+                <dd><h4>{{ caso.codigo_caso }}</h4></dd>
+                <dt><h4><strong>Creado: </strong></h4></dt>
+                <dd><h4>{{ caso.creado }}</h4></dd>
+              </dl>
+              	<!-- Descripcion Vertical -->
+              <dl>
+                <dt><h4><strong>Descripcion</strong></h4></dt>
+                <dd><h4>{{ caso.descripcion }}</h4></dd>
+              </dl>
+            </div>
+            {% if perms.oac.add_recaso %}
+            <!-- modal para responder -->
+            <div class="box-footer" id="mostrarmodal">
+                <!-- se muestra la modal para responder -->
+                <button type="button" class="btn btn-lg btn-primary center-block" data-toggle="modal" data-target="#exampleModal">Respoder...</button><br>
+            </div>
+            {% endif %}
+            <div class="box-footer">
+                <!-- se cargo la respuesta -->
+                <h4 class="text-green" style="display:none" id="exitoso"><i class="icon fa fa-check"></i> <strong>Respuesta Ingresada! </strong>
+                </h4>
+                <!-- error no se cargo la respuesta -->
+                <h4 class="text-red" style="display:none" id="error"><i class="icon fa fa-ban"></i> <strong>Error, no se guardo la respuesta! </strong>
+                </h4>    
+                
+            </div>
+            	
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">{% csrf_token %}
+      			  <div class="modal-dialog" role="document">
+      			    <div class="modal-content">
+      			      <div class="modal-header">
+      			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      			        <h4 class="modal-title" id="exampleModalLabel">Ingrese su Respuesta...</h4>
+      			      </div>
+      			      <div class="modal-body">
+      			        <form>
+      			          <div class="form-group" id="error-txt">
+      			            <label for="message-text" class="control-label">Respuesta:</label>
+      			            <textarea class="form-control" id="message-text" rows="10"></textarea>
+      			          </div>
+      			        </form>
+      			      </div>
+      			      <div class="modal-footer">
+
+                    <label class="control-label" style="float:left;color:red;display:none" id="alert-error"><i class="fa fa-times-circle-o"></i> No puedes dejar el campo vacio!
+                    </label>
+      			        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      			        <button type="button" class="btn btn-primary" id="btnrespuesta">Guardar Respuesta</button>
+
+      			      </div>
+      			    </div>
+      			  </div>
+			      </div>
+
+            <div class="box box-default box-solid" id="txtrespuesta">
+              <div class="box-header with-border">
+                <h3 class="box-title">Respuesta</h3>
+
+                <div class="box-tools pull-right">
+                  <!-- para editar la respuesta -->
+                {% if perms.oac.change_recaso %}
+                  <button type="button" class="btn btn-box-tool" id="editar-resp" data-toggle="modal" data-target="#exampleModal" title="Editar"><i class="fa fa-edit"></i>
+                  </button> | 
+                {% endif %}
+                  <!-- para ocultar la respuesta -->
+                  <button type="button" class="btn btn-box-tool" data-widget="collapse" title="Minimizar"><i class="fa fa-minus"></i>
+                  </button>
+                </div>
+                <!-- /.box-tools -->
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body a" style="display: block;" id="txtrespuesta">
+                <h4 id="h4-resp"></h4>
+              </div>
+              <!-- /.box-body -->
+            </div>
+          
+        </div>
+          <!-- /.box -->
+  </div>
+
+  <div class="col-md-5">
+      <div class="box box-solid">
+        <div class="callout callout-warning">
+
+          <h4><i class="fa fa-bullhorn"></i> Informacion de Ayuda</h4>
+          <p>Pautas a considerar al momento de responder un caso</p>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <dl>
+            <dt>Al momento de responder un caso es importante tomar en cuenta las siguientes recomendaciones::</dt><br>
+            <dd>
+              <ul>
+                <li>Tiene un tiempo no mayor de 5 días hábiles para dar una respuesta a las cosas que le competen.</li>
+                <li>La respuesta debe ser clara y concreta a lo que se está solicitando o denunciando.</li>
+                <li>De ser negativa la respuesta, sustentar por que fue negado.</li>
+                <li>De no haber una respuesta inmediata, se debe dar un estimo tiempo de resolución. </li>
+              </ul>
+            </dd>
+          </dl>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      <!-- /.box -->
+    </div>
+{% endblock %}
+
+{% block script %}
+<!-- jQuery 2.2.3 -->
+<script src="{% static "plugins/jQuery/jquery-2.2.3.min.js" %}"></script>
+<!-- Bootstrap 3.3.6 -->
+<script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+<!-- FastClick -->
+<script src="{% static "plugins/fastclick/fastclick.js" %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static "dist/js/app.min.js" %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static "dist/js/demo.js" %}"></script>
+<!-- Scrip para validar eventos -->
+<script src="{% static "jsgeneral/responder.caso.js" %}"></script>
+
+{% endblock %}

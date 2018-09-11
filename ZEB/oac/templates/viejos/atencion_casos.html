@@ -1,0 +1,44 @@
+<article >
+	<div id="registro-caso">
+	<h2><strong> Registro de Nuevo Caso</strong></h2>
+	<br>
+	</div>
+	<form method="POST" class="form-horizontal">
+        {% csrf_token %}
+        <div class="form-group">
+		    <label class="col-xs-4 control-label">Nombres: </label>
+		    <div class="col-xs-5">
+		      {{ form.nombres }}
+		    </div>
+	 	 </div>
+	 	 <div class="form-group">
+		    <label class="col-xs-4 control-label">Apellidos: </label>
+		    <div class="col-xs-5">
+		      {{ form.apellidos }}
+		    </div>
+	 	 </div>
+	 	 <div class="form-group">
+		    <label class="col-xs-4 control-label">Cedúla: </label>
+		    <div class="col-xs-4">
+		      {{ form.cedula }}
+		    </div>
+	 	 </div>
+	 	 <div class="form-group">
+		    <label class="col-xs-4 control-label">Departamento: </label>
+		    <div class="col-xs-5">
+		      {{ form.departamento }}
+		    </div>
+	 	 </div>
+	 	 <div class="form-group">
+		    <label class="col-xs-4 control-label">Descripcion del Caso: </label>
+		    <div class="col-xs-7">
+		      {{ form.descripcion }}
+		    </div>
+	 	 </div>
+	 	 <div class="form-group">
+		    <div class="col-sm-offset-4 col-xs-4">
+		      <button type="submit" class="btn btn-primary btn-lg">Ingresar</button>
+		    </div>
+		 </div>    
+    </form>
+</article>

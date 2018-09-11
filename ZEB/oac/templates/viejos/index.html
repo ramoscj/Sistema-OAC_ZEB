@@ -1,0 +1,93 @@
+<!-- <!doctype html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<title>REgistro de Casos</title>
+</head>
+<body>
+	<header>
+	<h1>Registro de Casos</h1>
+	<a href="{% url 'AtencionCasos' %}" >Registrar Caso</a><br><br>	
+	</header>
+	<div>
+		{% for caso in casos %}
+			<input type="text" value="{{ caso.creado }}" readonly="true">
+			<input type="text" value="{{ caso.descripcion }}" readonly="true"><br><br>	
+			<input type="text" value="{{ caso.nombres }} {{ caso.apellidos }} " readonly="true"><br>
+			<a href="{% url 'EditarCasos' pk=caso.pk %}" >Editar Caso</a><br><br>
+			
+		{% endfor %}
+	</div>
+</body>
+</html> -->
+
+<doctype html>
+<html lang="es">
+<head>
+
+	<meta charset="UTF-8">
+	<title>Listado de Casos</title>
+	<link rel="stylesheet" href="/static/css/boostrap/bootstrap.min.css">
+	<link rel="stylesheet" href="/static/css/normalize.css">
+	<link rel="stylesheet" href="/static/css/clases.css">
+	<link rel="stylesheet" href="/static/css/discusion.css">
+	
+
+	<script src="/static/js/jquery.min.js"></script>
+	 <!-- <script src="/static/js/prefixfree.min.js"></script> -->
+	<script src="/static/js/main.js"></script>
+	<script src="/static/js/boostrap/bootstrap.min.js"></script>
+	
+
+</head>
+<body>
+	<header>
+		<h1>Listado de Casos</h1>
+	</header>
+	<section id="wrapper">
+
+		<section id="side">	
+			<ul class="nav nav-pills nav-stacked">
+			  <li class="active"><a href="#">Home</a></li>
+			  <li><a href="#">Profile</a></li>
+			  <li class="disabled"><a href="#">Disabled</a></li>
+			  <li class="dropdown">
+			    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+			      Dropdown <span class="caret"></span>
+			    </a>
+			    <ul class="dropdown-menu">
+			      <li><a href="#">Action</a></li>
+			      <li><a href="#">Another action</a></li>
+			      <li><a href="#">Something else here</a></li>
+			      <li class="divider"></li>
+			      <li><a href="#">Separated link</a></li>
+			    </ul>
+			  </li>
+			</ul>
+		</section>
+
+		<section id="libro">
+		{% csrf_token %}
+			<article id="clases">
+				<ul>
+					{% for caso in casos %}
+					<li>
+						<a data-id="{{ caso.id }}">
+							<figure>
+								<img src="">
+								<figcaption>Caso de: {{ caso.nombres  }} {{ caso.apellidos  }} </br> </br>
+								Cedúla: {{ caso.cedula  }}</figcaption>
+
+							</figure>
+						</a>
+					</li>
+					{% endfor %}
+				</ul>
+			</article>
+			
+			<article id="contenido-clase"></article>
+		</section>
+
+	</section>
+</body>
+</html>

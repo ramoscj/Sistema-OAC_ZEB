@@ -1,0 +1,191 @@
+{% extends "../../index2.html" %}
+{% load staticfiles %}
+
+{% block header %}
+      <h1>
+        Lista de Mis Casos
+        <small>Casos atendidos por mi</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="{% url 'Inicio' %}"><i class="fa fa-dashboard"></i> Incio</a></li>
+        <li class="active">Lista de mis casos</li>
+      </ol>
+{% endblock %}
+
+{% block titulo %}
+  <title>Listado de Casos por responder | O.A.C</title>
+{% endblock %}
+
+{% block link %}
+<!-- Bootstrap 3.3.6 -->
+  <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{% static "plugins/datatables/dataTables.bootstrap.css" %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static "dist/css/AdminLTE.min.css" %}">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="{% static "dist/css/skins/_all-skins.min.css" %}">
+  <!-- Confirm style -->
+  <link rel="stylesheet" type="text/css" href="{% static "plugins/confirm-modal/jquery.confirm/jquery.confirm.css" %}" />
+  <link href="{% static "plugins/confirm-modal/jquery.confirm/fonts-css.css" %}" rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Cuprum&amp;subset=latin' rel='stylesheet' type='text/css'>
+  
+{% endblock %}
+
+{% block navegacion %}
+      
+      <ul class="sidebar-menu">
+        <li class="header">NAVEGACION PRINCIPAL</li>
+
+        <li>
+          <a href="{% url 'Inicio' %}">
+            <i class="fa fa-home"></i> <span>Inicio</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'ListaCasos' %}" >
+            <i class="fa fa-list-ul"></i> <span>Lista de Casos</span>
+          </a>
+        </li>
+        <li class="treeview active">
+          <a href="#">
+            <i class="fa fa-book"></i>
+            <span>Mis Casos</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+          {% if perms.oac.add_caso and perms.oac.delete_caso %}
+            <li class="active"><a href="{% url 'ListaCasosUsuario' %}"><i class="fa fa-circle-o"></i> Atendidos</a></li>
+            <li><a href="{% url 'ListaCasosInactivos' %}"><i class="fa fa-circle-o"></i> Eliminados</a></li>
+          {% endif %}
+          {% if perms.oac.add_recaso and perms.oac.change_recaso %}
+            <li><a href="{% url 'ListaCasosAtendidos' %}"><i class="fa fa-circle-o"></i> Atendidos</a></li>
+          {% endif %}
+          </ul>
+        </li>
+        <li>
+          <a href="{% url 'perfil_usuario' user.id %}">
+            <i class="fa fa-user"></i> <span>Perfil</span>
+          </a>
+        </li>
+        
+      </ul>
+{% endblock %}
+
+{% block contenido %}
+   <section class="content">
+        <!-- Default box -->
+        <div class="box" id="lista-casos">
+          <div class="box-header with-border">
+            <i class="fa fa-clipboard"></i>
+            <h3 class="box-title">Lista de Mis Casos Atendidos</h3>&nbsp;&nbsp;&nbsp;&nbsp;            
+            <!-- Mensaje de operacion exitosa -->
+              <h4 class="text-white" style="display:none" id="msjexitoso"><i class="icon fa fa-check">  </i> <strong>Caso eliminado existosamente! </strong>
+              </h4>
+            
+            <!-- Mensaje de error -->
+              <h4 class="text-white" style="display:none" id="msjerror"><i class="icon fa fa-ban">  </i> <strong>Error al eliminar el registro! </strong>
+              </h4>
+            
+          </div>
+          <div class="box-body">
+            {% csrf_token %}
+            <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>N°</th>
+                    <th>N° caso</th>
+                    <th>Nombres Apellidos</th>
+                    <th>Cedula</th>
+                    <th>Estado</th>
+                    <th>Creado</th>
+                    <th>Examinar</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% for caso in casos %}
+                 
+                    {% if caso.recaso.user_id == user.id %}
+
+                      <tr class="item_div">
+                        <td>{{forloop.counter}}</td>
+                        <td>{{caso.codigo_caso}}</td>
+                        <td>{{caso.nombres|upper}} {{caso.apellidos|upper}}</td>
+                        <td>{{caso.cedula}}</td>
+                        <td><span class="label label-success" style="font-size:0.9em">{{caso.estado}}</span></td>
+                        <td>{{caso.creado}}</td>
+                        <td>
+                          <a href="contenido/{{caso.id}}/" id="pk_caso" class="u btn btn-flat" ><i class="fa fa-search"></i><strong>&nbsp;&nbsp;Ver respuesta</strong></a>                   
+                        </td>
+                      </tr>
+
+                    {% endif %}
+
+                  {% endfor %}
+
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th>N°</th>
+                    <th>N° caso</th>
+                    <th>Nombres Apellidos</th>
+                    <th>Cedula</th>
+                    <th>Estado</th>
+                    <th>Creado</th>
+                    <th>Examinar</th>
+
+                  </tr>
+                </tfoot>
+            </table>
+          </div>
+        </div>
+        <!-- /.box -->
+        
+  </section>
+
+{% endblock %}
+
+{% block script %}
+
+<!-- jQuery 2.2.3 -->
+<script src="{% static "plugins/jQuery/jquery-2.2.3.min.js" %}"></script>
+<!-- Bootstrap 3.3.6 -->
+<script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+<!-- DataTables -->
+<script src="{% static "plugins/datatables/jquery.dataTables.min.js" %}"></script>
+<script src="{% static "plugins/datatables/dataTables.bootstrap.min.js" %}"></script>
+<!-- SlimScroll -->
+<script src="{% static "plugins/slimScroll/jquery.slimscroll.min.js" %}"></script>
+<!-- FastClick -->
+<script src="{% static "plugins/fastclick/fastclick.js" %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static "dist/js/app.min.js" %}"></script>
+<!-- AdminLT{% or dem " purposes -->
+<script src="{% static "dist/js/demo.js" %}"></script>
+<!-- confirm-modal -->
+<script src="{% static "plugins/confirm-modal/jquery.confirm/jquery.confirm.js" %}"></script>
+<script src="{% static "plugins/confirm-modal/js/script.js" %}"></script>
+<!-- page script -->
+<script>
+  $(function () {
+    $("#example1").DataTable();
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false
+    });
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,201 @@
+{% extends "../../index2.html" %}
+{% load staticfiles %}
+
+{% block header %}
+      <h1>
+        Lista de Casos
+        <small>Todos los registros atendidos y por atender</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="{% url 'Inicio' %}"><i class="fa fa-dashboard"></i> Inicio</a></li>
+        <li class="active">Casos</li>
+      </ol>
+{% endblock %}
+
+{% block titulo %}
+  <title>Listado de Casos | O.A.C</title>
+{% endblock %}
+
+{% block link %}
+<!-- Bootstrap 3.3.6 -->
+  <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{% static "plugins/datatables/dataTables.bootstrap.css" %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static "dist/css/AdminLTE.min.css" %}">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="{% static "dist/css/skins/_all-skins.min.css" %}">
+  <!-- Confirm style -->
+  <link rel="stylesheet" type="text/css" href="{% static "plugins/confirm-modal/jquery.confirm/jquery.confirm.css" %}" />
+  <link href="{% static "plugins/confirm-modal/jquery.confirm/fonts-css.css" %}" rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Cuprum&amp;subset=latin' rel='stylesheet' type='text/css'>
+  
+{% endblock %}
+
+{% block contenido %}
+   <section class="content">
+        <!-- Default box -->
+        <div class="box" id="lista-casos">
+          <div class="box-header with-border">
+            <i class="fa fa-clipboard"></i>
+            <h3 class="box-title">Lista de General de Casos</h3>&nbsp;&nbsp;&nbsp;&nbsp;            
+            <!-- Mensaje de operacion exitosa -->
+              <h4 class="text-white" style="display:none" id="msjexitoso"><i class="icon fa fa-check">  </i> <strong>Caso eliminado existosamente! </strong>
+              </h4>
+            
+            <!-- Mensaje de error -->
+              <h4 class="text-white" style="display:none" id="msjerror"><i class="icon fa fa-ban">  </i> <strong>Error al eliminar el registro! </strong>
+              </h4>
+            {% if perms.oac.add_caso %} 
+              <div class="box-tools pull-right">
+                <a href="{% url 'AtencionCasos' %}" class="btn btn-block btn-primary" role="button"><i class="glyphicon glyphicon-plus"></i>&nbsp; <strong>Agregar</strong></a>
+              </div>
+            {% endif %}
+          </div>
+          <div class="box-body">
+            {% csrf_token %}
+            <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>N°</th>
+                    <th>N° caso</th>
+                    <th>Nombres Apellidos</th>
+                    <th>Cedula</th>
+                    <th>Departamento</th>
+                    <th>Estado</th>
+                    <th>Creado</th>
+                    {% if perms.oac.add_caso %}
+                    <th>Visualizar</th>
+                    {% endif %}
+                    {% if perms.oac.add_recaso %}
+                    <th>Condición</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% for caso in casos %}
+                  <!-- para mostrar a los registran los casos -->
+                    {% if perms.oac.add_caso %}
+                      <tr class="item_div">
+                        <td>{{forloop.counter}}</td>
+                        <td>{{caso.codigo_caso}}</td>
+                        <td>{{caso.nombres|upper}} {{caso.apellidos|upper}}</td>
+                        <td>{{caso.cedula}}</td>
+                        <td>{{caso.departamento}}</td>
+                        {% if caso.estado == 'Atendido' %}
+                        <td><span class="label label-success" style="font-size:0.9em">{{caso.estado}}</span>
+                        </td>
+                        {% endif %}
+                        {% if caso.estado == 'Por atender' %}
+                        <td><span class="label label-warning" style="font-size:0.9em">{{caso.estado}}</span>
+                        </td>
+                        {% endif %}
+                        <td>{{caso.creado}}</td>
+                        {% if perms.oac.add_caso %}
+                          <td>
+                            <a href="{% url 'ContenidoCasos' caso.id%}" id="pk_caso" class="u btn btn-flat" ><i class="fa fa-search"></i><strong>&nbsp;&nbsp;Inspeccionar</strong></a>                   
+                          </td>
+                        {% endif %}
+                      </tr>
+                    {% endif %}
+
+                    <!-- para mostrar a los responden los casos -->
+                    {% if perms.oac.add_recaso and perms.oac.change_recaso %}
+
+                      {% if caso.departamento == user.perfilusuario.departamento %}
+                        <tr class="item_div">
+                          <td>{{forloop.counter}}</td>
+                          <td>{{caso.codigo_caso}}</td>
+                          <td>{{caso.nombres|upper}} {{caso.apellidos|upper}}</td>
+                          <td>{{caso.cedula}}</td>
+                          <td>{{caso.departamento}}</td>
+                          {% if caso.estado == 'Atendido' %}
+                          <td><span class="label label-success" style="font-size:0.9em">{{caso.estado}}</span>
+                          </td>
+                          {% endif %}
+                          {% if caso.estado == 'Por atender' %}
+                          <td><span class="label label-warning" style="font-size:0.9em">{{caso.estado}}</span>
+                          </td>
+                          {% endif %}
+                          <td>{{caso.creado}}</td>
+                          {% if caso.estado == 'Por atender' %}
+                            <td>
+                                <a href="{% url 'ContenidoCasos' caso.id %}" id="pk_caso" class="u btn btn-flat" ><i class="fa fa-pencil-square"></i><strong>&nbsp;&nbsp;Responder</strong></a>                   
+                             </td>
+                          {% else %}
+                            <td>
+                              <span class="label label-info" style="font-size:0.9em"><i class="icon fa fa-check"></i> <strong>Respondido</span>
+                            </td>
+                          {% endif %}
+                        </tr>
+                      {% endif %}
+
+                    {% endif %}
+
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th>N°</th>
+                    <th>N° caso</th>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>Cedula</th>
+                    <th>Departamento</th>
+                    <th>Creado</th>
+                    {% if perms.oac.add_caso %}
+                    <th>Visualizar</th>
+                    {% endif %}
+                    {% if perms.oac.add_recaso %}
+                    <th>Condición</th>
+                    {% endif %}
+                  </tr>
+                </tfoot>
+            </table>
+          </div>
+        </div>
+        <!-- /.box -->
+        
+  </section>
+
+{% endblock %}
+
+{% block script %}
+
+<!-- jQuery 2.2.3 -->
+<script src="{% static "plugins/jQuery/jquery-2.2.3.min.js" %}"></script>
+<!-- Bootstrap 3.3.6 -->
+<script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+<!-- DataTables -->
+<script src="{% static "plugins/datatables/jquery.dataTables.min.js" %}"></script>
+<script src="{% static "plugins/datatables/dataTables.bootstrap.min.js" %}"></script>
+<!-- SlimScroll -->
+<script src="{% static "plugins/slimScroll/jquery.slimscroll.min.js" %}"></script>
+<!-- FastClick -->
+<script src="{% static "plugins/fastclick/fastclick.js" %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static "dist/js/app.min.js" %}"></script>
+<!-- AdminLT{% or dem " purposes -->
+<script src="{% static "dist/js/demo.js" %}"></script>
+<!-- page script -->
+<script>
+  $(function () {
+    $("#example1").DataTable();
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false
+    });
+  });
+</script>
+
+{% endblock %}
